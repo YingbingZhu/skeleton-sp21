@@ -2,6 +2,7 @@ package game2048;
 
 import java.util.ArrayList;
 import java.util.Formatter;
+import java.util.HashSet;
 import java.util.Observable;
 
 
@@ -118,7 +119,7 @@ public class Model extends Observable {
         int length = this.board.size() - 1;
         int maxRow = length;
         for (int col=0; col<=length; col++){
-            for (int row = maxRow; row>=0; row--){
+            for (int row = length; row>=0; row--){
                 if (row == length){
                     continue;
                 }
@@ -126,11 +127,11 @@ public class Model extends Observable {
                 if (t == null) {
                     continue;
                 }
-                int nextRow = nextRow(col, row, maxRow, this.board);
+                int nextRow = Model.getNextRow(col, row, maxRow, this.board);
                 if (nextRow!=row){
                     // maxRow -= 1 ensure we  cant merge  to be merged again
                     if (board.move(col, nextRow, t)){
-                        this.score += this.board.tile(col,nextRow).value();
+                        this.score += this.board.tile(col, nextRow).value();
                         maxRow-=1;
                     }
                     changed = true;
@@ -138,19 +139,21 @@ public class Model extends Observable {
             }
             maxRow = length;
         }
-        this.board.setViewingPerspective(Side.NORTH);
         checkGameOver();
         if (changed) {
             setChanged();
         }
+        this.board.setViewingPerspective(Side.NORTH);
         return changed;
     }
 
-    /*a method return desired row value*/
-    public static int nextRow(int col, int row, int maxRow, Board b) {
+    /*a method return desired row number*/
+    public static int getNextRow(int col, int row, int maxRow, Board b) {
         for (int i = maxRow; i>=0; i--){
-            if ((b.tile(col, i) == null)
-                    || (b.tile(col, row).value() == b.tile(col, i).value())) {
+            if ((b.tile(col, i) == null)) {
+                return i;
+            }
+            if (b.tile(col, row).value() == b.tile(col, i).value()){
                 return i;
             }
         }
@@ -222,6 +225,10 @@ public class Model extends Observable {
                 Tile t = b.tile(i, j);
                 ArrayList<Tile> tiles = Model.fourDirectionValidate(b, i, j);
                 for (Tile tile : tiles) {
+                    /* check for nulls */
+                    if (tile == null) {
+                        continue;
+                    }
                     if (tile.value() == t.value()) {
                         return true;
                     }
@@ -231,18 +238,9 @@ public class Model extends Observable {
         return false;
     }
 
-//    /*return available tiles */
-//    public static Tile[] fourDirectionValidate(Board b, int row, int col) {
-//        Tile[] tiles = new Tile[4];
-////        int cnt = 0;
-//        int length = b.size();
-//        if (Model.ValidIndex(col-1, row, length)){
-//            tiles
-//        }
-//    }
 
     public static ArrayList<Tile> fourDirectionValidate(Board b, int row, int col) {
-        ArrayList<Tile> tiles = new ArrayList<>(4);
+        ArrayList<Tile> tiles = new ArrayList<>();
         int length = b.size();
         if (Model.ValidIndex(col-1, row, length)){
             tiles.add(b.tile(col-1,row));
@@ -263,7 +261,11 @@ public class Model extends Observable {
         if (col<0||row<0)   {
             return false;
         }
-        return col < length && row < length;
+        if (col >= length || row >= length)  {
+            return false;
+        }
+//        return col < length && row < length;
+        return true;
     }
 
 
