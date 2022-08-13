@@ -1,5 +1,6 @@
 package game2048;
 
+import java.util.ArrayList;
 import java.util.Formatter;
 import java.util.Observable;
 
@@ -113,12 +114,47 @@ public class Model extends Observable {
         // TODO: Modify this.board (and perhaps this.score) to account
         // for the tilt to the Side SIDE. If the board changed, set the
         // changed local variable to true.
-
+        this.board.setViewingPerspective(side);
+        int length = this.board.size() - 1;
+        int maxRow = length;
+        for (int col=0; col<=length; col++){
+            for (int row = maxRow; row>=0; row--){
+                if (row == length){
+                    continue;
+                }
+                Tile t = this.board.tile(col, row);
+                if (t == null) {
+                    continue;
+                }
+                int nextRow = nextRow(col, row, maxRow, this.board);
+                if (nextRow!=row){
+                    // maxRow -= 1 ensure we  cant merge  to be merged again
+                    if (board.move(col, nextRow, t)){
+                        this.score += this.board.tile(col,nextRow).value();
+                        maxRow-=1;
+                    }
+                    changed = true;
+                }
+            }
+            maxRow = length;
+        }
+        this.board.setViewingPerspective(Side.NORTH);
         checkGameOver();
         if (changed) {
             setChanged();
         }
         return changed;
+    }
+
+    /*a method return desired row value*/
+    public static int nextRow(int col, int row, int maxRow, Board b) {
+        for (int i = maxRow; i>=0; i--){
+            if ((b.tile(col, i) == null)
+                    || (b.tile(col, row).value() == b.tile(col, i).value())) {
+                return i;
+            }
+        }
+        return row;
     }
 
     /** Checks if the game is over and sets the gameOver variable
@@ -138,6 +174,15 @@ public class Model extends Observable {
      * */
     public static boolean emptySpaceExists(Board b) {
         // TODO: Fill in this function.
+
+        for (int i=0; i < b.size(); i++){
+            for (int j=0; j < b.size(); j++){
+                if (b.tile(i,j)==null){
+                    return true;
+                }
+            }
+        }
+
         return false;
     }
 
@@ -148,6 +193,16 @@ public class Model extends Observable {
      */
     public static boolean maxTileExists(Board b) {
         // TODO: Fill in this function.
+        for (int i=0; i < b.size(); i++){
+            for (int j=0; j < b.size(); j++){
+                if (b.tile(i,j) == null){
+                    continue;
+                }
+                if (b.tile(i,j).value()==MAX_PIECE){
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
@@ -159,12 +214,60 @@ public class Model extends Observable {
      */
     public static boolean atLeastOneMoveExists(Board b) {
         // TODO: Fill in this function.
+        for (int i = 0; i < b.size(); i++) {
+            for (int j = 0; j < b.size(); j++) {
+                if (b.tile(i, j) == null) {
+                    return true;
+                }
+                Tile t = b.tile(i, j);
+                ArrayList<Tile> tiles = Model.fourDirectionValidate(b, i, j);
+                for (Tile tile : tiles) {
+                    if (tile.value() == t.value()) {
+                        return true;
+                    }
+                }
+            }
+        }
         return false;
+    }
+
+//    /*return available tiles */
+//    public static Tile[] fourDirectionValidate(Board b, int row, int col) {
+//        Tile[] tiles = new Tile[4];
+////        int cnt = 0;
+//        int length = b.size();
+//        if (Model.ValidIndex(col-1, row, length)){
+//            tiles
+//        }
+//    }
+
+    public static ArrayList<Tile> fourDirectionValidate(Board b, int row, int col) {
+        ArrayList<Tile> tiles = new ArrayList<>(4);
+        int length = b.size();
+        if (Model.ValidIndex(col-1, row, length)){
+            tiles.add(b.tile(col-1,row));
+        }
+        if (Model.ValidIndex(col, row+1, length)) {
+            tiles.add(b.tile(col, row+1));
+        }
+        if (Model.ValidIndex(col+1, row, length)){
+            tiles.add(b.tile(col+1,row));
+        }
+        if (Model.ValidIndex(col, row-1, length)){
+            tiles.add(b.tile(col,row-1));
+        }
+        return tiles;
+    }
+
+    public static boolean ValidIndex(int col, int row, int length) {
+        if (col<0||row<0)   {
+            return false;
+        }
+        return col < length && row < length;
     }
 
 
     @Override
-     /** Returns the model as a string, used for debugging. */
     public String toString() {
         Formatter out = new Formatter();
         out.format("%n[%n");
