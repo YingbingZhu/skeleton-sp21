@@ -83,14 +83,14 @@ public class CheckLabConfig {
 			checkConfig(false);
 		}
 
-		/*if (yourOS.contains("mac")) {
-			if (yourOSVersion.contains("10.15")) {
-				checkConfig(false);
-			} else {
-				checkConfig(false);
-			}
-		} // for future reference in case we need to test configurations separately
-		     for Mac OS, Catalina, Linux, etc*/
+//		/*if (yourOS.contains("mac")) {
+//			if (yourOSVersion.contains("10.15")) {
+//				checkConfig(false);
+//			} else {
+//				checkConfig(false);
+//			}
+//		} // for future reference in case we need to test configurations separately
+//		     for Mac OS, Catalina, Linux, etc*/
 
 		System.out.println("Your system appears to be configured correctly. You've completed lab 1 setup.");
 	}
