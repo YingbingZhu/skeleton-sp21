@@ -8,6 +8,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
     private int nextFirst = 0;
     private int nextLast = 0;
     public int size = 0;
+    
 
     /*constructor*/
     public ArrayDeque(){
@@ -17,12 +18,20 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
        nextLast = 1;
     }
 
-    public ArrayDeque(ArrayDeque o){
-        items =  (T[]) new Object[o.items.length];
-        size = o.size;
-        nextFirst = o.nextFirst;
-        nextLast = o.nextLast;
+    public int size(){
+        return size;
     }
+
+    public boolean isEmpty(){
+        return size ==0;
+    }
+
+//    public ArrayDeque(ArrayDeque o){
+//        items =  (T[]) new Object[o.items.length];
+//        size = o.size;
+//        nextFirst = o.nextFirst;
+//        nextLast = o.nextLast;
+//    }
 
     /* get the last index */
     private int minusOne(int index) {
@@ -37,12 +46,16 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
     private int plusOne(int index, int length) {
         return Math.floorMod(index+1, length);
     }
-    
+
     public void addFirst(T item){
         resize();
         items[nextFirst] = item;
         size++;
         nextFirst = minusOne(nextFirst);
+    }
+
+    public T getFirst(){
+        return items[plusOne(nextFirst)];
     }
 
     public void addLast(T item){
@@ -73,10 +86,12 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
 
     private void resizeHelper(int capacity){
         T[] tempArr = items;
-        int begin = minusOne(nextFirst);
-        int end = plusOne(nextLast);
+        int begin = plusOne(nextFirst);
+        int end = minusOne(nextLast);
         items = (T[]) new Object[capacity];
-        for (int i =0; i!=end; i=plusOne(i, tempArr.length)){
+        nextFirst = 0;
+        nextLast = 1;
+        for (int i = begin; i!=end; i=plusOne(i, tempArr.length)){
             items[nextLast] = tempArr[i];
             nextLast = plusOne(nextLast);
         }
@@ -84,19 +99,11 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         nextLast = plusOne(nextLast);
     }
 
-    public int size(){
-        return size;
-    }
-
     public void printDeque(){
         for (int i = plusOne(nextFirst); i!=nextLast; i = plusOne(i)){
             System.out.print(items[i] + " ");
         }
         System.out.println();
-    }
-
-    public T getFirst(){
-        return items[plusOne(nextFirst)];
     }
 
     public T getLast(){
@@ -114,13 +121,13 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
       size--;
       return item;
     }
-    
+
     public T removeLast(){
         if (isEmpty()) {
             return null;
         }
         resize();
-        T item = getFirst();
+        T item = getLast();
         nextLast = minusOne(nextLast);
         items[nextLast] = null;
         size--;
@@ -189,7 +196,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
     public Iterator<T> iterator() {
         return new ArrayDequeIterator();
     }
-    
-    
+
+
 
 }
