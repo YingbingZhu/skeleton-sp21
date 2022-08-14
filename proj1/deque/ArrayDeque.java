@@ -146,7 +146,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         private int pos;
 
         ArrayDequeIterator() {
-            pos = plusOne(pos);
+            pos = plusOne(nextFirst);
         }
 
         @Override
