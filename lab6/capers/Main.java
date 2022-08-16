@@ -1,6 +1,7 @@
 package capers;
 
 import java.io.File;
+import java.util.Arrays;
 
 import static capers.Utils.*;
 
@@ -39,6 +40,7 @@ public class Main {
     public static void main(String[] args) {
         if (args.length == 0) {
             Utils.exitWithError("Must have at least one argument");
+            System.out.println("args: " + Arrays.toString(args));
         }
 
         CapersRepository.setupPersistence();
